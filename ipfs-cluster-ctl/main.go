@@ -14,6 +14,7 @@ import (
 
 	"github.com/ipfs/ipfs-cluster/api"
 	"github.com/ipfs/ipfs-cluster/api/rest/client"
+	ci "github.com/ipfs/ipfs-cluster/api/rest/client_interface"
 	uuid "github.com/satori/go.uuid"
 
 	cid "github.com/ipfs/go-cid"
@@ -40,7 +41,7 @@ var (
 
 var logger = logging.Logger("cluster-ctl")
 
-var globalClient *client.Client
+var globalClient ci.ClientIface
 
 // Description provides a short summary of the functionality of this tool
 var Description = fmt.Sprintf(`
@@ -896,7 +897,7 @@ func waitFor(
 		defer cancel()
 	}
 
-	fp := client.StatusFilterParams{
+	fp := api.StatusFilterParams{
 		Cid:       ci,
 		Local:     false,
 		Target:    target,

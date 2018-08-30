@@ -894,3 +894,12 @@ type IPFSRepoStat struct {
 	RepoSize   uint64
 	StorageMax uint64
 }
+
+// StatusFilterParams contains the parameters required
+// to filter a stream of status results.
+type StatusFilterParams struct {
+       Cid       *cid.Cid
+       Local     bool
+       Target    TrackerStatus
+       CheckFreq time.Duration
+}
