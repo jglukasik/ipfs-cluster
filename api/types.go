@@ -898,8 +898,8 @@ type IPFSRepoStat struct {
 // StatusFilterParams contains the parameters required
 // to filter a stream of status results.
 type StatusFilterParams struct {
-       Cid       *cid.Cid
-       Local     bool
-       Target    TrackerStatus
-       CheckFreq time.Duration
+	Cid       *cid.Cid
+	Local     bool
+	Target    TrackerStatus
+	CheckFreq time.Duration
 }

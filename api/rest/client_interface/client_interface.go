@@ -19,7 +19,7 @@ type ClientIface interface {
 	PeerAdd(pid peer.ID) (api.ID, error)
 	PeerRm(id peer.ID) error
 
-	Add(paths []string, params *api.AddParams, out chan<- *api.AddedOutput,) error
+	Add(paths []string, params *api.AddParams, out chan<- *api.AddedOutput) error
 	Pin(ci *cid.Cid, replicationFactorMin, replicationFactorMax int, name string) error
 	Unpin(ci *cid.Cid) error
 
