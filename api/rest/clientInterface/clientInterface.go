@@ -1,4 +1,4 @@
-package client_interface
+package clientInterface
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	peer "github.com/libp2p/go-libp2p-peer"
 )
 
+// ClientIface defines the interface to be used by API clients to interact with
+// the ipfs-cluster-service
 type ClientIface interface {
 	IPFS() *shell.Shell
 	ID() (api.ID, error)

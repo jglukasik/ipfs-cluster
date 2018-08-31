@@ -14,7 +14,7 @@ import (
 
 	"github.com/ipfs/ipfs-cluster/api"
 	"github.com/ipfs/ipfs-cluster/api/rest/client"
-	ci "github.com/ipfs/ipfs-cluster/api/rest/client_interface"
+	ci "github.com/ipfs/ipfs-cluster/api/rest/clientInterface"
 	uuid "github.com/satori/go.uuid"
 
 	cid "github.com/ipfs/go-cid"
