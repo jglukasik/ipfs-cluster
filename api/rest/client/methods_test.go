@@ -12,7 +12,6 @@ import (
 	ma "github.com/multiformats/go-multiaddr"
 
 	types "github.com/ipfs/ipfs-cluster/api"
-	ci "github.com/ipfs/ipfs-cluster/api/rest/clientInterface"
 
 	"github.com/ipfs/ipfs-cluster/api"
 	"github.com/ipfs/ipfs-cluster/api/rest"
