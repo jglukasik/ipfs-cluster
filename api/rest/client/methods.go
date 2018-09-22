@@ -207,7 +207,7 @@ func (c *Client) GetConnectGraph() (api.ConnectGraphSerial, error) {
 // WaitFor is a utility function that allows for a caller to
 // wait for a paticular status for a CID. It returns a channel
 // upon which the caller can wait for the targetStatus.
-func (c *Client) WaitFor(ctx context.Context, fp api.StatusFilterParams) (api.GlobalPinInfo, error) {
+func WaitFor(ctx context.Context, c ClientIface, fp StatusFilterParams) (api.GlobalPinInfo, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -233,6 +233,15 @@ func (c *Client) WaitFor(ctx context.Context, fp api.StatusFilterParams) (api.Gl
 	}
 }
 
+// StatusFilterParams contains the parameters required
+// to filter a stream of status results.
+type StatusFilterParams struct {
+	Cid       *cid.Cid
+	Local     bool
+	Target    api.TrackerStatus
+	CheckFreq time.Duration
+}
+
 type statusFilter struct {
 	In, Out chan api.GlobalPinInfo
 	Done    chan struct{}
@@ -248,7 +257,7 @@ func newStatusFilter() *statusFilter {
 	}
 }
 
-func (sf *statusFilter) filter(ctx context.Context, fp api.StatusFilterParams) {
+func (sf *statusFilter) filter(ctx context.Context, fp StatusFilterParams) {
 	defer close(sf.Done)
 	defer close(sf.Out)
 
@@ -276,7 +285,7 @@ func (sf *statusFilter) filter(ctx context.Context, fp api.StatusFilterParams) {
 	}
 }
 
-func (sf *statusFilter) pollStatus(ctx context.Context, c *Client, fp api.StatusFilterParams) {
+func (sf *statusFilter) pollStatus(ctx context.Context, c ClientIface, fp StatusFilterParams) {
 	ticker := time.NewTicker(fp.CheckFreq)
 	defer ticker.Stop()
 
