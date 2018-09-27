@@ -24,47 +24,79 @@ import (
 
 // Configuration defaults
 var (
-	DefaultTimeout   = 0
-	DefaultAPIAddr   = "/ip4/127.0.0.1/tcp/9094"
+	DefaultTimeout	 = 0
+	DefaultAPIAddr	 = "/ip4/127.0.0.1/tcp/9094"
 	DefaultLogLevel  = "info"
 	DefaultProxyPort = 9095
-	ResolveTimeout   = 30 * time.Second
-	DefaultPort      = 9094
+	ResolveTimeout	 = 30 * time.Second
+	DefaultPort	 = 9094
 )
 
 var loggingFacility = "apiclient"
 var logger = logging.Logger(loggingFacility)
 
-// ClientIface defines the interface to be used by API clients to interact with
-// the ipfs-cluster-service
+// the Client interface defines the interface to be used by API clients to
+// interact with the ipfs-cluster-service
 type Client interface {
-	IPFS() *shell.Shell
+	// ID returns information about the cluster Peer.
 	ID() (api.ID, error)
 
+	// Peers requests ID information for all cluster peers.
 	Peers() ([]api.ID, error)
+	// PeerAdd adds a new peer to the cluster.
 	PeerAdd(pid peer.ID) (api.ID, error)
+	// PeerRm removes a current peer from the cluster
 	PeerRm(id peer.ID) error
 
+	// Add imports files to the cluster from the given paths.
 	Add(paths []string, params *api.AddParams, out chan<- *api.AddedOutput) error
+	// AddMultiFile imports new files from a MultiFileReader.
 	AddMultiFile(multiFileR *files.MultiFileReader, params *api.AddParams, out chan<- *api.AddedOutput) error
 
+	// Pin tracks a Cid with the given replication factor and a name for
+	// human-friendliness.
 	Pin(ci *cid.Cid, replicationFactorMin, replicationFactorMax int, name string) error
+	// Unpin untracks a Cid from cluster.
 	Unpin(ci *cid.Cid) error
 
+	// Allocations returns the consensus state listing all tracked items
+	// and the peers that should be pinning them.
 	Allocations(filter api.PinType) ([]api.Pin, error)
+	// Allocation returns the current allocations for a given Cid.
 	Allocation(ci *cid.Cid) (api.Pin, error)
 
+	// Status returns the current ipfs state for a given Cid. If local is true,
+	// the information affects only the current peer, otherwise the information
+	// is fetched from all cluster peers.
 	Status(ci *cid.Cid, local bool) (api.GlobalPinInfo, error)
+	// StatusAll gathers Status() for all tracked items.
 	StatusAll(local bool) ([]api.GlobalPinInfo, error)
 
+	// Sync makes sure the state of a Cid corresponds to the state reported
+	// by the ipfs daemon, and returns it. If local is true, this operation
+	// only happens on the current peer, otherwise it happens on every
+	// cluster peer.
 	Sync(ci *cid.Cid, local bool) (api.GlobalPinInfo, error)
+	// SyncAll triggers Sync() operations for all tracked items. It only
+	// returns informations for items that were de-synced or have an error
+	// state. If local is true, the operation is limited to the current
+	// peer. Otherwise it happens on every cluster peer.
 	SyncAll(local bool) ([]api.GlobalPinInfo, error)
 
+	// Recover retriggers pin or unpin ipfs operations for a Cid in error
+	// state.  If local is true, the operation is limited to the current
+	// peer, otherwise it happens on every cluster peer.
 	Recover(ci *cid.Cid, local bool) (api.GlobalPinInfo, error)
+	// RecoverAll triggers Recover() operations on all tracked items. If
+	// local is true, the operation is limited to the current peer.
+	// Otherwise, it happens everywhere.
 	RecoverAll(local bool) ([]api.GlobalPinInfo, error)
 
+	// Version returns the ipfs-cluster peer's version.
 	Version() (api.Version, error)
 
+	// GetConnectGraph returns an ipfs-cluster connection graph.  The
+	// serialized version, strings instead of pids, is returned
 	GetConnectGraph() (api.ConnectGraphSerial, error)
 }
 
@@ -120,21 +152,21 @@ type Config struct {
 // DefaultClient provides methods to interact with the ipfs-cluster API. Use
 // NewDefaultClient() to create one.
 type DefaultClient struct {
-	ctx       context.Context
-	cancel    func()
-	config    *Config
+	ctx	  context.Context
+	cancel	  func()
+	config	  *Config
 	transport *http.Transport
-	net       string
+	net	  string
 	hostname  string
-	client    *http.Client
-	p2p       host.Host
+	client	  *http.Client
+	p2p	  host.Host
 }
 
 // NewClient initializes a client given a Config.
 func NewDefaultClient(cfg *Config) (*DefaultClient, error) {
 	ctx := context.Background()
 	client := &DefaultClient{
-		ctx:    ctx,
+		ctx:	ctx,
 		config: cfg,
 	}
 
@@ -254,7 +286,7 @@ func (c *DefaultClient) setupProxy() error {
 		return nil
 	}
 
-	// Guess location from  APIAddr
+	// Guess location from	APIAddr
 	port, err := ma.NewMultiaddr(fmt.Sprintf("/tcp/%d", DefaultProxyPort))
 	if err != nil {
 		return err
