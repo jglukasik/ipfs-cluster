@@ -24,18 +24,18 @@ import (
 
 // Configuration defaults
 var (
-	DefaultTimeout	 = 0
-	DefaultAPIAddr	 = "/ip4/127.0.0.1/tcp/9094"
+	DefaultTimeout   = 0
+	DefaultAPIAddr   = "/ip4/127.0.0.1/tcp/9094"
 	DefaultLogLevel  = "info"
 	DefaultProxyPort = 9095
-	ResolveTimeout	 = 30 * time.Second
-	DefaultPort	 = 9094
+	ResolveTimeout   = 30 * time.Second
+	DefaultPort      = 9094
 )
 
 var loggingFacility = "apiclient"
 var logger = logging.Logger(loggingFacility)
 
-// the Client interface defines the interface to be used by API clients to
+// Client interface defines the interface to be used by API clients to
 // interact with the ipfs-cluster-service
 type Client interface {
 	// ID returns information about the cluster Peer.
@@ -152,21 +152,21 @@ type Config struct {
 // DefaultClient provides methods to interact with the ipfs-cluster API. Use
 // NewDefaultClient() to create one.
 type DefaultClient struct {
-	ctx	  context.Context
-	cancel	  func()
-	config	  *Config
+	ctx       context.Context
+	cancel    func()
+	config    *Config
 	transport *http.Transport
-	net	  string
+	net       string
 	hostname  string
-	client	  *http.Client
-	p2p	  host.Host
+	client    *http.Client
+	p2p       host.Host
 }
 
-// NewClient initializes a client given a Config.
+// NewDefaultClient initializes a client given a Config.
 func NewDefaultClient(cfg *Config) (*DefaultClient, error) {
 	ctx := context.Background()
 	client := &DefaultClient{
-		ctx:	ctx,
+		ctx:    ctx,
 		config: cfg,
 	}
 
