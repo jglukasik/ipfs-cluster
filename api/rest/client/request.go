@@ -12,7 +12,7 @@ import (
 
 type responseDecoder func(d *json.Decoder) error
 
-func (c *Client) do(
+func (c *DefaultClient) do(
 	method, path string,
 	headers map[string]string,
 	body io.Reader,
@@ -26,7 +26,7 @@ func (c *Client) do(
 	return c.handleResponse(resp, obj)
 }
 
-func (c *Client) doStream(
+func (c *DefaultClient) doStream(
 	method, path string,
 	headers map[string]string,
 	body io.Reader,
@@ -40,7 +40,7 @@ func (c *Client) doStream(
 	return c.handleStreamResponse(resp, outHandler)
 }
 
-func (c *Client) doRequest(
+func (c *DefaultClient) doRequest(
 	method, path string,
 	headers map[string]string,
 	body io.Reader,
@@ -73,7 +73,7 @@ func (c *Client) doRequest(
 
 	return c.client.Do(r)
 }
-func (c *Client) handleResponse(resp *http.Response, obj interface{}) error {
+func (c *DefaultClient) handleResponse(resp *http.Response, obj interface{}) error {
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
@@ -110,7 +110,7 @@ func (c *Client) handleResponse(resp *http.Response, obj interface{}) error {
 	return nil
 }
 
-func (c *Client) handleStreamResponse(resp *http.Response, handler responseDecoder) error {
+func (c *DefaultClient) handleStreamResponse(resp *http.Response, handler responseDecoder) error {
 	if resp.StatusCode > 399 && resp.StatusCode < 600 {
 		return c.handleResponse(resp, nil)
 	}

@@ -64,12 +64,12 @@ func peerMAddr(a *rest.API) ma.Multiaddr {
 	return listenAddr.Encapsulate(ipfsAddr)
 }
 
-func testClientHTTP(t *testing.T, api *rest.API) *Client {
+func testClientHTTP(t *testing.T, api *rest.API) *DefaultClient{
 	cfg := &Config{
 		APIAddr:           apiMAddr(api),
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,13 +77,13 @@ func testClientHTTP(t *testing.T, api *rest.API) *Client {
 	return c
 }
 
-func testClientLibp2p(t *testing.T, api *rest.API) *Client {
+func testClientLibp2p(t *testing.T, api *rest.API) *DefaultClient {
 	cfg := &Config{
 		APIAddr:           peerMAddr(api),
 		ProtectorKey:      make([]byte, 32),
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func testClientLibp2p(t *testing.T, api *rest.API) *Client {
 	return c
 }
 
-func TestNewClient(t *testing.T) {
+func TestNewDefaultClient(t *testing.T) {
 	api := testAPI(t)
 	defer shutdown(api)
 
@@ -111,7 +111,7 @@ func TestDefaultAddress(t *testing.T) {
 		APIAddr:           nil,
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func TestMultiaddressPrecedence(t *testing.T) {
 		Port:              "9094",
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestHostPort(t *testing.T) {
 		Port:              "9094",
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +173,7 @@ func TestDNSMultiaddress(t *testing.T) {
 		Port:              "9094",
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +194,7 @@ func TestPeerAddress(t *testing.T) {
 		Port:              "9094",
 		DisableKeepAlives: true,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,7 +213,7 @@ func TestProxyAddress(t *testing.T) {
 		DisableKeepAlives: true,
 		ProxyAddr:         addr,
 	}
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +239,7 @@ func TestIPFS(t *testing.T) {
 		ProxyAddr:         proxyAddr,
 	}
 
-	c, err := NewClient(cfg)
+	c, err := NewDefaultClient(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

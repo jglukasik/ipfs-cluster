@@ -40,7 +40,7 @@ var (
 
 var logger = logging.Logger("cluster-ctl")
 
-var globalClient client.ClientIface
+var globalClient client.Client
 
 // Description provides a short summary of the functionality of this tool
 var Description = fmt.Sprintf(`
@@ -172,7 +172,7 @@ requires authorization. implies --https, which you can disable with --force-http
 			checkErr("", errors.New("unsupported encoding"))
 		}
 
-		globalClient, err = client.NewClient(cfg)
+		globalClient, err = client.NewDefaultClient(cfg)
 		checkErr("creating API client", err)
 		return nil
 	}
