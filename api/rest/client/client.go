@@ -151,7 +151,7 @@ type Config struct {
 
 // DefaultClient provides methods to interact with the ipfs-cluster API. Use
 // NewDefaultClient() to create one.
-type DefaultClient struct {
+type defaultClient struct {
 	ctx       context.Context
 	cancel    func()
 	config    *Config
@@ -163,9 +163,9 @@ type DefaultClient struct {
 }
 
 // NewDefaultClient initializes a client given a Config.
-func NewDefaultClient(cfg *Config) (*DefaultClient, error) {
+func NewDefaultClient(cfg *Config) (Client, error) {
 	ctx := context.Background()
-	client := &DefaultClient{
+	client := &defaultClient{
 		ctx:    ctx,
 		config: cfg,
 	}
@@ -212,7 +212,7 @@ func NewDefaultClient(cfg *Config) (*DefaultClient, error) {
 	return client, nil
 }
 
-func (c *DefaultClient) setupAPIAddr() error {
+func (c *defaultClient) setupAPIAddr() error {
 	var addr ma.Multiaddr
 	var err error
 	if c.config.APIAddr == nil {
@@ -229,7 +229,7 @@ func (c *DefaultClient) setupAPIAddr() error {
 	return nil
 }
 
-func (c *DefaultClient) resolveAPIAddr() error {
+func (c *defaultClient) resolveAPIAddr() error {
 	resolveCtx, cancel := context.WithTimeout(c.ctx, ResolveTimeout)
 	defer cancel()
 	resolved, err := madns.Resolve(resolveCtx, c.config.APIAddr)
@@ -245,7 +245,7 @@ func (c *DefaultClient) resolveAPIAddr() error {
 	return nil
 }
 
-func (c *DefaultClient) setupHTTPClient() error {
+func (c *defaultClient) setupHTTPClient() error {
 	var err error
 
 	switch {
@@ -268,7 +268,7 @@ func (c *DefaultClient) setupHTTPClient() error {
 	return nil
 }
 
-func (c *DefaultClient) setupHostname() error {
+func (c *defaultClient) setupHostname() error {
 	// Extract host:port form APIAddr or use Host:Port.
 	// For libp2p, hostname is set in enableLibp2p()
 	if !IsPeerAddress(c.config.APIAddr) {
@@ -281,7 +281,7 @@ func (c *DefaultClient) setupHostname() error {
 	return nil
 }
 
-func (c *DefaultClient) setupProxy() error {
+func (c *defaultClient) setupProxy() error {
 	if c.config.ProxyAddr != nil {
 		return nil
 	}
@@ -299,7 +299,7 @@ func (c *DefaultClient) setupProxy() error {
 // configured ProxyAddr (or to the default ipfs-cluster's IPFS proxy port).
 // It re-uses this Client's HTTP client, thus will be constrained by
 // the same configurations affecting it (timeouts...).
-func (c *DefaultClient) IPFS() *shell.Shell {
+func (c *defaultClient) IPFS() *shell.Shell {
 	return shell.NewShellWithClient(c.config.ProxyAddr.String(), c.client)
 }
 

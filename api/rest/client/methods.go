@@ -20,14 +20,14 @@ import (
 )
 
 // ID returns information about the cluster Peer.
-func (c *DefaultClient) ID() (api.ID, error) {
+func (c *defaultClient) ID() (api.ID, error) {
 	var id api.IDSerial
 	err := c.do("GET", "/id", nil, nil, &id)
 	return id.ToID(), err
 }
 
 // Peers requests ID information for all cluster peers.
-func (c *DefaultClient) Peers() ([]api.ID, error) {
+func (c *defaultClient) Peers() ([]api.ID, error) {
 	var ids []api.IDSerial
 	err := c.do("GET", "/peers", nil, nil, &ids)
 	result := make([]api.ID, len(ids))
@@ -42,7 +42,7 @@ type peerAddBody struct {
 }
 
 // PeerAdd adds a new peer to the cluster.
-func (c *DefaultClient) PeerAdd(pid peer.ID) (api.ID, error) {
+func (c *defaultClient) PeerAdd(pid peer.ID) (api.ID, error) {
 	pidStr := peer.IDB58Encode(pid)
 	body := peerAddBody{pidStr}
 
@@ -56,13 +56,13 @@ func (c *DefaultClient) PeerAdd(pid peer.ID) (api.ID, error) {
 }
 
 // PeerRm removes a current peer from the cluster
-func (c *DefaultClient) PeerRm(id peer.ID) error {
+func (c *defaultClient) PeerRm(id peer.ID) error {
 	return c.do("DELETE", fmt.Sprintf("/peers/%s", id.Pretty()), nil, nil, nil)
 }
 
 // Pin tracks a Cid with the given replication factor and a name for
 // human-friendliness.
-func (c *DefaultClient) Pin(ci *cid.Cid, replicationFactorMin, replicationFactorMax int, name string) error {
+func (c *defaultClient) Pin(ci *cid.Cid, replicationFactorMin, replicationFactorMax int, name string) error {
 	escName := url.QueryEscape(name)
 	err := c.do(
 		"POST",
@@ -81,13 +81,13 @@ func (c *DefaultClient) Pin(ci *cid.Cid, replicationFactorMin, replicationFactor
 }
 
 // Unpin untracks a Cid from cluster.
-func (c *DefaultClient) Unpin(ci *cid.Cid) error {
+func (c *defaultClient) Unpin(ci *cid.Cid) error {
 	return c.do("DELETE", fmt.Sprintf("/pins/%s", ci.String()), nil, nil, nil)
 }
 
 // Allocations returns the consensus state listing all tracked items and
 // the peers that should be pinning them.
-func (c *DefaultClient) Allocations(filter api.PinType) ([]api.Pin, error) {
+func (c *defaultClient) Allocations(filter api.PinType) ([]api.Pin, error) {
 	var pins []api.PinSerial
 
 	types := []api.PinType{
@@ -118,7 +118,7 @@ func (c *DefaultClient) Allocations(filter api.PinType) ([]api.Pin, error) {
 }
 
 // Allocation returns the current allocations for a given Cid.
-func (c *DefaultClient) Allocation(ci *cid.Cid) (api.Pin, error) {
+func (c *defaultClient) Allocation(ci *cid.Cid) (api.Pin, error) {
 	var pin api.PinSerial
 	err := c.do("GET", fmt.Sprintf("/allocations/%s", ci.String()), nil, nil, &pin)
 	return pin.ToPin(), err
@@ -127,14 +127,14 @@ func (c *DefaultClient) Allocation(ci *cid.Cid) (api.Pin, error) {
 // Status returns the current ipfs state for a given Cid. If local is true,
 // the information affects only the current peer, otherwise the information
 // is fetched from all cluster peers.
-func (c *DefaultClient) Status(ci *cid.Cid, local bool) (api.GlobalPinInfo, error) {
+func (c *defaultClient) Status(ci *cid.Cid, local bool) (api.GlobalPinInfo, error) {
 	var gpi api.GlobalPinInfoSerial
 	err := c.do("GET", fmt.Sprintf("/pins/%s?local=%t", ci.String(), local), nil, nil, &gpi)
 	return gpi.ToGlobalPinInfo(), err
 }
 
 // StatusAll gathers Status() for all tracked items.
-func (c *DefaultClient) StatusAll(local bool) ([]api.GlobalPinInfo, error) {
+func (c *defaultClient) StatusAll(local bool) ([]api.GlobalPinInfo, error) {
 	var gpis []api.GlobalPinInfoSerial
 	err := c.do("GET", fmt.Sprintf("/pins?local=%t", local), nil, nil, &gpis)
 	result := make([]api.GlobalPinInfo, len(gpis))
@@ -147,7 +147,7 @@ func (c *DefaultClient) StatusAll(local bool) ([]api.GlobalPinInfo, error) {
 // Sync makes sure the state of a Cid corresponds to the state reported by
 // the ipfs daemon, and returns it. If local is true, this operation only
 // happens on the current peer, otherwise it happens on every cluster peer.
-func (c *DefaultClient) Sync(ci *cid.Cid, local bool) (api.GlobalPinInfo, error) {
+func (c *defaultClient) Sync(ci *cid.Cid, local bool) (api.GlobalPinInfo, error) {
 	var gpi api.GlobalPinInfoSerial
 	err := c.do("POST", fmt.Sprintf("/pins/%s/sync?local=%t", ci.String(), local), nil, nil, &gpi)
 	return gpi.ToGlobalPinInfo(), err
@@ -157,7 +157,7 @@ func (c *DefaultClient) Sync(ci *cid.Cid, local bool) (api.GlobalPinInfo, error)
 // informations for items that were de-synced or have an error state. If
 // local is true, the operation is limited to the current peer. Otherwise
 // it happens on every cluster peer.
-func (c *DefaultClient) SyncAll(local bool) ([]api.GlobalPinInfo, error) {
+func (c *defaultClient) SyncAll(local bool) ([]api.GlobalPinInfo, error) {
 	var gpis []api.GlobalPinInfoSerial
 	err := c.do("POST", fmt.Sprintf("/pins/sync?local=%t", local), nil, nil, &gpis)
 	result := make([]api.GlobalPinInfo, len(gpis))
@@ -170,7 +170,7 @@ func (c *DefaultClient) SyncAll(local bool) ([]api.GlobalPinInfo, error) {
 // Recover retriggers pin or unpin ipfs operations for a Cid in error state.
 // If local is true, the operation is limited to the current peer, otherwise
 // it happens on every cluster peer.
-func (c *DefaultClient) Recover(ci *cid.Cid, local bool) (api.GlobalPinInfo, error) {
+func (c *defaultClient) Recover(ci *cid.Cid, local bool) (api.GlobalPinInfo, error) {
 	var gpi api.GlobalPinInfoSerial
 	err := c.do("POST", fmt.Sprintf("/pins/%s/recover?local=%t", ci.String(), local), nil, nil, &gpi)
 	return gpi.ToGlobalPinInfo(), err
@@ -179,7 +179,7 @@ func (c *DefaultClient) Recover(ci *cid.Cid, local bool) (api.GlobalPinInfo, err
 // RecoverAll triggers Recover() operations on all tracked items. If local is
 // true, the operation is limited to the current peer. Otherwise, it happens
 // everywhere.
-func (c *DefaultClient) RecoverAll(local bool) ([]api.GlobalPinInfo, error) {
+func (c *defaultClient) RecoverAll(local bool) ([]api.GlobalPinInfo, error) {
 	var gpis []api.GlobalPinInfoSerial
 	err := c.do("POST", fmt.Sprintf("/pins/recover?local=%t", local), nil, nil, &gpis)
 	result := make([]api.GlobalPinInfo, len(gpis))
@@ -190,7 +190,7 @@ func (c *DefaultClient) RecoverAll(local bool) ([]api.GlobalPinInfo, error) {
 }
 
 // Version returns the ipfs-cluster peer's version.
-func (c *DefaultClient) Version() (api.Version, error) {
+func (c *defaultClient) Version() (api.Version, error) {
 	var ver api.Version
 	err := c.do("GET", "/version", nil, nil, &ver)
 	return ver, err
@@ -198,7 +198,7 @@ func (c *DefaultClient) Version() (api.Version, error) {
 
 // GetConnectGraph returns an ipfs-cluster connection graph.
 // The serialized version, strings instead of pids, is returned
-func (c *DefaultClient) GetConnectGraph() (api.ConnectGraphSerial, error) {
+func (c *defaultClient) GetConnectGraph() (api.ConnectGraphSerial, error) {
 	var graphS api.ConnectGraphSerial
 	err := c.do("GET", "/health/graph", nil, nil, &graphS)
 	return graphS, err
@@ -365,7 +365,7 @@ func makeSerialFile(fpath string, params *api.AddParams) (files.File, error) {
 // sharding the resulting DAG across the IPFS daemons of multiple cluster
 // peers. The output channel will receive regular updates as the adding
 // process progresses.
-func (c *DefaultClient) Add(
+func (c *defaultClient) Add(
 	paths []string,
 	params *api.AddParams,
 	out chan<- *api.AddedOutput,
@@ -400,7 +400,7 @@ func (c *DefaultClient) Add(
 }
 
 // AddMultiFile imports new files from a MultiFileReader. See Add().
-func (c *DefaultClient) AddMultiFile(
+func (c *defaultClient) AddMultiFile(
 	multiFileR *files.MultiFileReader,
 	params *api.AddParams,
 	out chan<- *api.AddedOutput,

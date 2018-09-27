@@ -12,7 +12,7 @@ import (
 
 type responseDecoder func(d *json.Decoder) error
 
-func (c *DefaultClient) do(
+func (c *defaultClient) do(
 	method, path string,
 	headers map[string]string,
 	body io.Reader,
@@ -26,7 +26,7 @@ func (c *DefaultClient) do(
 	return c.handleResponse(resp, obj)
 }
 
-func (c *DefaultClient) doStream(
+func (c *defaultClient) doStream(
 	method, path string,
 	headers map[string]string,
 	body io.Reader,
@@ -40,7 +40,7 @@ func (c *DefaultClient) doStream(
 	return c.handleStreamResponse(resp, outHandler)
 }
 
-func (c *DefaultClient) doRequest(
+func (c *defaultClient) doRequest(
 	method, path string,
 	headers map[string]string,
 	body io.Reader,
@@ -73,7 +73,7 @@ func (c *DefaultClient) doRequest(
 
 	return c.client.Do(r)
 }
-func (c *DefaultClient) handleResponse(resp *http.Response, obj interface{}) error {
+func (c *defaultClient) handleResponse(resp *http.Response, obj interface{}) error {
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
@@ -110,7 +110,7 @@ func (c *DefaultClient) handleResponse(resp *http.Response, obj interface{}) err
 	return nil
 }
 
-func (c *DefaultClient) handleStreamResponse(resp *http.Response, handler responseDecoder) error {
+func (c *defaultClient) handleStreamResponse(resp *http.Response, handler responseDecoder) error {
 	if resp.StatusCode > 399 && resp.StatusCode < 600 {
 		return c.handleResponse(resp, nil)
 	}
